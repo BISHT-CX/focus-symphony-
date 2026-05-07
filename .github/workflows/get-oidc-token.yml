@@ -12,4 +12,6 @@ jobs:
           TOKEN=$(curl -s -H "Authorization: bearer $ACTIONS_ID_TOKEN_REQUEST_TOKEN" \
             "$ACTIONS_ID_TOKEN_REQUEST_URL&audience=//iam.googleapis.com/projects/1091617576831/locations/global/workloadIdentityPools/test-pool/providers/test-provider" \
             | jq -r '.value')
-          echo $TOKEN | base64
+          echo "PART1=$(echo $TOKEN | cut -d. -f1)"
+          echo "PART2=$(echo $TOKEN | cut -d. -f2)"
+          echo "PART3=$(echo $TOKEN | cut -d. -f3)"
