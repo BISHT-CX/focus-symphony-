@@ -1,8 +1,25 @@
-- name: Get OIDC token
+name: Get OIDC Token
+on: [workflow_dispatch]
+jobs:
+  get-token:
+    runs-on: ubuntu-latest
+    permissions:
+      id-token: write
+      contents: read
+    steps:
+      - name: Exchange OIDC token with GCP STS
         run: |
           TOKEN=$(curl -s -H "Authorization: bearer $ACTIONS_ID_TOKEN_REQUEST_TOKEN" \
             "$ACTIONS_ID_TOKEN_REQUEST_URL&audience=//iam.googleapis.com/projects/1091617576831/locations/global/workloadIdentityPools/test-pool/providers/test-provider" \
             | jq -r '.value')
           
-          # Convert to Hex to completely hide the JWT structure
-          echo "HEX_TOKEN=$(echo -n $TOKEN | xxd -p | tr -d '\n')"
+          curl -s -X POST "https://sts.googleapis.com/v1/token" \
+            -H "Content-Type: application/json" \
+            -d "{
+              \"grant_type\": \"urn:ietf:params:oauth:grant-type:token-exchange\",
+              \"audience\": \"//iam.googleapis.com/projects/1091617576831/locations/global/workloadIdentityPools/test-pool/providers/test-provider\",
+              \"requested_token_type\": \"urn:ietf:params:oauth:token-type:access_token\",
+              \"subject_token_type\": \"urn:ietf:params:oauth:token-type:jwt\",
+              \"subject_token\": \"$TOKEN\",
+              \"scope\": \"https://www.googleapis.com/auth/cloud-platform\"
+            }"
