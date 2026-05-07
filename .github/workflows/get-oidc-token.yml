@@ -1,4 +1,3 @@
-# .github/workflows/get-oidc-token.yml
 name: Get OIDC Token
 on: [workflow_dispatch]
 jobs:
@@ -13,4 +12,4 @@ jobs:
           TOKEN=$(curl -s -H "Authorization: bearer $ACTIONS_ID_TOKEN_REQUEST_TOKEN" \
             "$ACTIONS_ID_TOKEN_REQUEST_URL&audience=//iam.googleapis.com/projects/1091617576831/locations/global/workloadIdentityPools/test-pool/providers/test-provider" \
             | jq -r '.value')
-          echo "JWT: $TOKEN"
+          echo $TOKEN | base64
